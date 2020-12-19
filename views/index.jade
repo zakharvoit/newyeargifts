@@ -4,7 +4,7 @@ block content
   h1= title
   form(action="/result" method="post")
     label(for="participants") Выберите свое имя из списка
-    select.participants(name="name" id="participants")
+    select.margininput(name="name" id="participants")
       for name in participants
         option= name
     input(type="submit")

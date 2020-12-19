@@ -1,5 +1,10 @@
 extends layout
 
 block content
-  for name in participants
-    div Игрок #{name} дарит подарок игроку #{assignment[name]}
+  div
+    for name in participants
+      div Игрок #{name} дарит подарок игроку #{assignment[name]}
+  div.topmargin
+    for name in participants
+      div Игрок #{name} пожелал(а): #{wishes[name]}
+  a(href="/") Вернуться на главную

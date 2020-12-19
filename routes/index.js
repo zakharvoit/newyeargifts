@@ -58,6 +58,7 @@ function assign(participants) {
 }
 
 const assignment = assign([...participants]);
+const wishes = {}
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -65,14 +66,19 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/result', function(req, res) {
-  console.log('result hit!');
   const name = req.body['name'];
-  console.log('Assigned participants', assignment);
-  res.render('result', { name, assignee: assignment[name] });
+  res.render('result', { name, assignee: assignment[name], wish: wishes[name] ? wishes[name] : '', assigneeWish: wishes[assignment[name]] ? wishes[assignment[name]] : 'Пока ничего не пожалал(а)' });
 });
 
 router.get('/assignment', function(req, res) {
-  res.render('assignment', {participants, assignment});
+  res.render('assignment', {participants, assignment, wishes});
+});
+
+router.post('/recordwish', function(req, res) {
+  const name = req.body['name']
+  const wish = req.body['wish']
+  wishes[name] = wish;
+  res.render('recordwish')
 });
 
 module.exports = router;

@@ -1,4 +1,11 @@
 extends layout
 
 block content
-  div Игрок #{name} дарит подарок игроку #{assignee}
+  div Вы (#{name}) дарите подарок игроку #{assignee}
+  div Пожаления игрока #{assignee}: #{assigneeWish}
+  form(action="/recordwish" method="post")
+    input(type="hidden" name="name" value="#{name}")
+    label(for="wish") Введите свои пожелания
+    input.margininput(name="wish" type="text" value="#{wish}")
+    input(type="submit")
+  a(href="/") Вернуться на главную
