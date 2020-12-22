@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+import {Assignment, Wish} from '../database';
 
 const participants = [
     'Захар',
@@ -57,27 +58,68 @@ function assign(participants) {
   return assigned;
 }
 
-const assignment = assign([...participants]);
-const wishes = {}
+async function populateAssignments(participants) {
+  const assignmentByName = assign(participants);
+  const assignments = [];
+  for (const name of Object.keys(assignmentByName)) {
+    const model = new Assignment({
+      name: name,
+      assignee: assignmentByName[name],
+    });
+    assignments.push(model);
+    await Assignment.create(model);
+  }
+  return assignments;
+}
+
+async function fetchAssignments(participants) {
+  const assignments = await Assignment.find({});
+  if (assignments.length === 0)
+    return populateAssignments(participants);
+  return assignments;
+}
+
+async function fetchWishes(participants) {
+  const wishes = {};
+  for (const participant of participants) {
+    const wish = await Wish.findOne({name: participant});
+    if (wish)
+      wishes[wish.name] = wish.wish;
+    else
+      wishes[participant] = 'Пока ничего не пожелал(а)';
+  }
+  return wishes;
+}
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', async function(req, res, next) {
   res.render('index', { title: 'Тайный Санта', participants });
 });
 
-router.post('/result', function(req, res) {
+router.post('/result', async function(req, res) {
   const name = req.body['name'];
-  res.render('result', { name, assignee: assignment[name], wish: wishes[name] ? wishes[name] : '', assigneeWish: wishes[assignment[name]] ? wishes[assignment[name]] : 'Пока ничего не пожалал(а)' });
+  await fetchAssignments(participants);
+  const assignment = await Assignment.findOne({ name });
+  const wish = await Wish.findOne({ name });
+  res.render('result', {
+    name,
+    assignee: assignment.assignee,
+    wish: wish ? wish.wish : ''
+  });
 });
 
-router.get('/assignment', function(req, res) {
-  res.render('assignment', {participants, assignment, wishes});
+router.get('/assignment', async function(req, res) {
+  res.render('assignment', {
+    participants,
+    assignments: await fetchAssignments(participants),
+    wishes: await fetchWishes(participants),
+  });
 });
 
-router.post('/recordwish', function(req, res) {
+router.post('/recordwish', async function(req, res) {
   const name = req.body['name']
   const wish = req.body['wish']
-  wishes[name] = wish;
+  await Wish.create(new Wish({name, wish}));
   res.render('recordwish')
 });
 

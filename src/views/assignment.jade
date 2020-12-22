@@ -2,8 +2,8 @@ extends layout
 
 block content
   div
-    for name in participants
-      div Игрок #{name} дарит подарок игроку #{assignment[name]}
+    each assignment in assignments
+      div Игрок #{assignment.name} дарит подарок игроку #{assignment.assignee}
   div.topmargin
     for name in participants
       div Игрок #{name} пожелал(а): #{wishes[name]}

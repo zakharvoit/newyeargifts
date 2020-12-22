@@ -3,11 +3,21 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose')
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
 var app = express();
+
+export async function initMongoDb() {
+  const promise = mongoose.connect('mongodb://localhost:27017/newyeargifts')
+  const db = mongoose.connection
+  db.on('error', err => console.error(`Database error ${err}`))
+  return promise
+}
+
+initMongoDb().then(() => {});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
