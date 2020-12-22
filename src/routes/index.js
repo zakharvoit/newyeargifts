@@ -101,10 +101,12 @@ router.post('/result', async function(req, res) {
   await fetchAssignments(participants);
   const assignment = await Assignment.findOne({ name });
   const wish = await Wish.findOne({ name });
+  const assigneeWish = await Wish.findOne({ name: assignment.assignee });
   res.render('result', {
     name,
     assignee: assignment.assignee,
-    wish: wish ? wish.wish : ''
+    wish: wish ? wish.wish : '',
+    assigneeWish: assigneeWish ? assigneeWish.wish : 'Пока ничего не пожелал(а)'
   });
 });
 
@@ -119,7 +121,7 @@ router.get('/assignment', async function(req, res) {
 router.post('/recordwish', async function(req, res) {
   const name = req.body['name']
   const wish = req.body['wish']
-  await Wish.create(new Wish({name, wish}));
+  await Wish.updateOne({ name }, { $set: { name, wish } }, { upsert: true });
   res.render('recordwish')
 });
 

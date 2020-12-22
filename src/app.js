@@ -11,7 +11,7 @@ var usersRouter = require('./routes/users');
 var app = express();
 
 export async function initMongoDb() {
-  const promise = mongoose.connect('mongodb://localhost:27017/newyeargifts')
+  const promise = mongoose.connect('mongodb://mongo:27017/newyeargifts')
   const db = mongoose.connection
   db.on('error', err => console.error(`Database error ${err}`))
   return promise
